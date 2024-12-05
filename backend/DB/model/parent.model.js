@@ -1,5 +1,5 @@
 import mongoose,{Schema,model} from "mongoose";
-const parentSchema = new mongoose.Schema({
+const parentSchema = new Schema({
     username: {
         type: String,
         required: true,
