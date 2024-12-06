@@ -5,7 +5,6 @@ export const fileValidation={
 function fileUpload(customValidation=[]){
     const storage=multer.diskStorage({});
     function fileFilter(req,file,cb){
-        console.log(file);
         if(customValidation.includes(file.mimetype)){
             cb(null,true);
         }else{

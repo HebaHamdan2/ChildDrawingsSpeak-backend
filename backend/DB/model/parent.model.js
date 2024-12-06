@@ -7,8 +7,9 @@ const parentSchema = new Schema({
         max:20
     },
     profilePic:{
-        type:String
-    },
+      type:Object,
+      default:null
+  },
     email: {
         type: String,
         required: true,
@@ -44,5 +45,5 @@ const parentSchema = new Schema({
   }
 );
 
-const parentModel = mongoose.model.Parent ||('Parent', parentSchema);
+const parentModel = mongoose.model.Parent ||model('Parent', parentSchema);
 export default parentModel;
