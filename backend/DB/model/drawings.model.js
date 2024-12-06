@@ -1,24 +1,25 @@
 import mongoose ,{ Schema,model } from "mongoose";
 
-const drawingSchema = new Schema({
+const drawingSchema = new Schema(
+  {
     imageUrl: {
       type: String,
-      required: true
+      required: true,
     },
     prediction: {
       type: Object,
-      required: true
+      required: true,
     },
     childId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: 'Child',
-      required: true
+      ref: "Child", // Reference to Child schema
+      required: true,
     },
   },
   {
     timestamps: true,
-  });
-  
+  }
+);
 const drawingModel =
 mongoose.models.Drawing || model("Drawing", drawingSchema);
 export default drawingModel;
