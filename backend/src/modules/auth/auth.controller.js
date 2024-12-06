@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 import { sendEmail } from '../../services/email.js';
 import { customAlphabet } from 'nanoid';
 export const signUp=async(req,res,next)=>{
-    const {username,email,password}=req.body;
+    const {username,email,password,address}=req.body;
     const user=await parentModel.findOne({email});
     if(user){
         return next(new Error("Email already exists",{cause:409}));
@@ -28,6 +28,7 @@ export const signUp=async(req,res,next)=>{
         email,
         password:hashPassword,
        profilePic:{secure_url,public_id},
+       address
     });
     return res.status(201).json({message:"success",createParent});
 } 

@@ -3,10 +3,10 @@ import parentModel from "../../DB/model/parent.model.js";
 export const auth=()=>{
     return async(req,res,next)=>{
         const {authorization}=req.headers;
-        if(!authorization?.startsWith(process.env.EARERKEY)){
+        if(!authorization?.startsWith(process.env.BEARERKEY)){
             return res.status(400).json({message:"Invalid autherization!"})
         }
-        const token=authorization.split(process.env.EARERKEY)[1];
+        const token=authorization.split(process.env.BEARERKEY)[1];
         const decoded=jwt.verify(token,process.env.LOGINSECRET);
         if(!decoded){
             return res.status(400).json({message:"Invalid Autherization!"})

@@ -11,6 +11,11 @@ const childSchema = new Schema(
       type: Date,
       required: true,
     },
+    gender:{
+      type:String,
+      enum:["Male","Female"],
+      required: true,
+  },
     profilePic: {
       type: Object,
     },
