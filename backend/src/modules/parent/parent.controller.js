@@ -1,3 +1,4 @@
+import childModel from "../../../DB/model/child.model.js";
 import parentModel from "../../../DB/model/parent.model.js";
 import cloudinary from "../../services/cloudinary.js";
 import bcrypt from "bcryptjs";
@@ -59,3 +60,18 @@ export const updateProfile = async (req, res, next) => {
         user.save();
         return res.status(200).json({message:"success"});
     }
+export const deleteAccount=async(req,res,next)=>{
+  const parentId=req.user._id;
+  const parent=await parentModel.findByIdAndDelete(parentId)
+if(!parent){
+  return next(new Error(`parent not found`,{cause:404}))
+}
+    const children = await childModel.find({ parentId });
+    const childIds = children.map((child) => child._id);
+    // Delete all drawings associated with these children
+    await drawingModel.deleteMany({ childId: { $in: childIds } });
+    // Delete all children associated with the parent
+    await childModel.deleteMany({ parentId });
+    return res.status(200).json({ message: "Parent account and associated data deleted successfully" });
+  
+};

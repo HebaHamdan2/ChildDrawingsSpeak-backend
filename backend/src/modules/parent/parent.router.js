@@ -10,5 +10,5 @@ const router=Router();
 router.get('/',auth(),asyncHandler(parentController.profile));//diaply parent profile 
 router.patch('/',auth(),fileUpload(fileValidation.image).single('image'),validation(valdators.profile),asyncHandler(parentController.updateProfile));//update parent profile info
 router.patch("/updatePassword",auth(),validation(valdators.updatePassword),asyncHandler(parentController.updatePassword));//update password
-
+router.delete("/delete",auth(),asyncHandler(parentController.deleteAccount));//delete my account
 export default router;
