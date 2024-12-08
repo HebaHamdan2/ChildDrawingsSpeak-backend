@@ -15,6 +15,11 @@ const drawingSchema = new Schema(
       ref: "Child", // Reference to Child schema
       required: true,
     },
+      parentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Parent",
+      required: true,
+    }
   },
   {
     timestamps: true,
