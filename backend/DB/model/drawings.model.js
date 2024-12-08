@@ -3,7 +3,7 @@ import mongoose ,{ Schema,model } from "mongoose";
 const drawingSchema = new Schema(
   {
     imageUrl: {
-      type: String,
+      type: Object,
       required: true,
     },
     prediction: {

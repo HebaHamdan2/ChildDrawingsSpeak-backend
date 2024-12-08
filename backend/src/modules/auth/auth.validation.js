@@ -2,7 +2,7 @@ import joi from 'joi';
 import { generalFields } from '../../middleware/validation.js';
 
 export const signupSchema=  joi.object( {
-        username:joi.string().alphanum().required(),
+        username:joi.string().min(4).max(20).required(),
         email:generalFields.email,
         password:generalFields.password,
         cPassword:joi.valid(joi.ref('password')).required(),

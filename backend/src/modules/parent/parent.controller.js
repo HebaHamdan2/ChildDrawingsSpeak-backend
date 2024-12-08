@@ -3,29 +3,21 @@ import drawingModel from "../../../DB/model/drawings.model.js";
 import parentModel from "../../../DB/model/parent.model.js";
 import cloudinary from "../../services/cloudinary.js";
 import bcrypt from "bcryptjs";
-export const profile=async(req,res,next)=>{
-    const user=await parentModel.findById(req.user._id);
-    return res.status(200).json({message:"success",user});
+export const getAccountInfo=async(req,res,next)=>{
+  const parent = await parentModel.findById(req.user._id).populate('children')
+    return res.status(200).json({message:"success",parent});
 }
-export const updateProfile = async (req, res, next) => {
+export const updateAccount = async (req, res, next) => {
     try {
       let updates = {};
-  
-      // Handle profile picture upload
       if (req.file) {
         const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
           folder: `${process.env.APP_NAME}/user/${req.user._id}/profile`,
         });
-  
-        // Get the current user's profile
         const user = await parentModel.findById(req.user._id);
-  
-        // If an existing profile picture exists, delete it
         if (user?.profilePic?.public_id) {
           await cloudinary.uploader.destroy(user.profilePic.public_id);
         }
-  
-        // Prepare the update for the profile picture
         updates.profilePic = { secure_url, public_id };
       }
   
@@ -63,12 +55,31 @@ export const updateProfile = async (req, res, next) => {
     }
 export const deleteAccount=async(req,res,next)=>{
   const parentId=req.user._id;
-  const parent=await parentModel.findByIdAndDelete(parentId)
-if(!parent){
-  return next(new Error(`parent not found`,{cause:404}))
-}
-  await drawingModel.deleteMany({ parentId });
-  await childModel.deleteMany({ parentId });
+ const parent = await parentModel.findById(parentId);
+ if (!parent) {
+   return next(new Error(`Parent not found`, { cause: 404 }));
+ }
+ if (parent.profilePic?.public_id) {
+   await cloudinary.uploader.destroy(parent.profilePic.public_id);
+ }
+ const children = await childModel.find({ parentId });
+
+ for (const child of children) {
+   if (child.profilePic?.public_id) {
+     await cloudinary.uploader.destroy(child.profilePic.public_id);
+   }
+ }
+
+ const drawings = await drawingModel.find({ parentId });
+ for (const drawing of drawings) {
+   if (drawing.imageUrl?.public_id) {
+     await cloudinary.uploader.destroy(drawing.imageUrl.public_id);
+   }
+ }
+ await drawingModel.deleteMany({ parentId });
+ await childModel.deleteMany({ parentId });
+ await parentModel.findByIdAndDelete(parentId);
+
 
     return res.status(200).json({ message: "Parent account and associated data deleted successfully" });
   
