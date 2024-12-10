@@ -7,7 +7,7 @@ export const signupSchema=  joi.object( {
         password:generalFields.password,
         cPassword:joi.valid(joi.ref('password')).required(),
         address:joi.string().alphanum().required(),
-        file:generalFields.file.required(),
+        file:generalFields.file,
         })
 
 

@@ -25,12 +25,6 @@ const parentSchema = new Schema(
       type: Boolean,
       default: false,
     },
-    children: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Child", // Reference to Child schema
-      },
-    ],
     sendCode: {
       type: String,
       default: null,
@@ -51,7 +45,7 @@ const parentSchema = new Schema(
 );
 
 // Virtual field for Parent to Child relationship
-parentSchema.virtual("childrenDetails", {
+parentSchema.virtual("children", {
   ref: "Child",
   localField: "_id",
   foreignField: "parentId",

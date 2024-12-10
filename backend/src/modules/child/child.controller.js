@@ -4,11 +4,11 @@ import cloudinary from "../../services/cloudinary.js";
 import {pagination} from "../../services/pagination.js"
 export const createProfile=async(req,res,next)=>{
 const {name,dateOfBirth,gender}=req.body;
-const child=await childModel.findOne({name});
-if(child){
-    return next(new Error(`${name} already has profile`,{cause:409}));
-}
 const parentId=req.user._id;
+const child = await childModel.findOne({ name, parentId }); 
+if(child) {
+    return next(new Error(`${name} already has a profile under the given parentId`, { cause: 409 }));
+}
 let profilePic=null;
 if(req?.file?.path){
     const {secure_url,public_id}=await cloudinary.uploader.upload(req.file.path,{
@@ -18,12 +18,10 @@ if(req?.file?.path){
 profilePic={secure_url,public_id};
 }
 const Child=await childModel.create({name,dateOfBirth,profilePic,parentId,gender})
-await parentModel.findByIdAndUpdate(parentId, { $push: { children: Child._id } });
 
 return res.status(201).json({message:"success",Child});
 
 }
-
 export const getProfiles = async (req, res, next) => {
     try {
       const { skip, limit } = pagination(req.query.page, req.query.limit);
@@ -44,7 +42,7 @@ export const getProfiles = async (req, res, next) => {
       queryObj = JSON.parse(queryObj);
   
       // Initialize the Mongoose query
-      let mongooseQuery = childModel.find(queryObj).limit(limit).skip(skip);
+      let mongooseQuery = childModel.find(queryObj).limit(limit).skip(skip).populate('drawings');
   
       // Add search functionality
       if (req.query.search) {
@@ -75,7 +73,69 @@ export const getProfiles = async (req, res, next) => {
       return next(error);
     }
   };
-  export const getSpecificProfile = async (req, res) => {
+export const getSpecificProfile = async (req, res) => {
     const child = await childModel.findById(req.params.childId);
     return res.status(200).json({ message: "success", child });
+  };
+export const updateProfile = async (req, res, next) => {
+    try {
+      let updates = {};
+      if (req.file) {
+        const { secure_url, public_id } = await cloudinary.uploader.upload(req.file.path, {
+          folder: `${process.env.APP_NAME}/children`,
+        });
+        const child = await childModel.findById(req.params.childId);
+        if (child?.profilePic?.public_id) {
+          await cloudinary.uploader.destroy(child.profilePic.public_id);
+        }
+        updates.profilePic = { secure_url, public_id };
+      }
+  
+      if (req.body.dateOfBirth) {
+        updates.dateOfBirth = req.body.dateOfBirth;
+      }
+      if (req.body.gender) {
+        updates.gender = req.body.gender;
+      }
+      if (req.body.name) {
+        const parentId=req.user._id;
+        const child = await childModel.findOne({name:req.body.name, parentId }); 
+        if(child) {
+            return next(new Error(`${req.body.name} already has a profile under the given parentId`, { cause: 409 }));
+        }else{
+          updates.name = req.body.name;
+
+        }
+      }
+      const updatedUser = await childModel.findByIdAndUpdate(req.params.childId, updates, { new: true });
+  
+      return res.json({ message: "Profile updated successfully", user: updatedUser });
+    } catch (error) {
+      return res.status(500).json({ message: "Internal Server Error", error: error.message });
+    }
+  };
+  export const deleteChild=async(req,res,next)=>{
+    const childId=req.params.childId;
+   const child = await childModel.findById(childId);
+   if (!child) {
+     return next(new Error(`Child not found`, { cause: 404 }));
+   }
+   if (child.profilePic?.public_id) {
+     await cloudinary.uploader.destroy(child.profilePic.public_id);
+   }
+   await childModel.findOneAndDelete({ _id:childId });
+   
+
+   const drawings = await drawingModel.find({ childId });
+   for (const drawing of drawings) {
+     if (drawing.imageUrl?.public_id) {
+       await cloudinary.uploader.destroy(drawing.imageUrl.public_id);
+     }
+   }
+   await drawingModel.deleteMany({ parentId });
+   await childModel.deleteMany({ parentId });
+   await parentModel.findByIdAndDelete(parentId);
+  
+      return res.status(200).json({ message: "Parent account and associated data deleted successfully" });
+    
   };

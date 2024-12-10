@@ -11,12 +11,17 @@ export const signUp=async(req,res,next)=>{
         return next(new Error("Email already exists",{cause:409}));
     } 
     const hashPassword=bcrypt.hashSync(password,parseInt(process.env.SALT_ROUND));
-    const { secure_url, public_id } = await cloudinary.uploader.upload(
+    let profilePic={};
+    if(req.file?.path){
+      const { secure_url, public_id } = await cloudinary.uploader.upload(
         req.file.path,
         {
-          folder: `${process.env.APP_NAME}/parents`,
+          folder: `${process.env.APP_NAME}/user/${req.user._id}/profile`,
         }
       );
+      profilePic={secure_url,public_id};
+    }
+ 
     const token=jwt.sign({email},process.env.CONFIRMEMAILSECRET);
     await sendEmail(
       email,
@@ -27,7 +32,7 @@ export const signUp=async(req,res,next)=>{
         username,
         email,
         password:hashPassword,
-       profilePic:{secure_url,public_id},
+       profilePic,
        address
     });
     return res.status(201).json({message:"success",createParent});
