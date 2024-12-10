@@ -1,4 +1,5 @@
 import childModel from "../../../DB/model/child.model.js";
+import drawingModel from "../../../DB/model/drawings.model.js";
 import parentModel from "../../../DB/model/parent.model.js";
 import cloudinary from "../../services/cloudinary.js";
 import {pagination} from "../../services/pagination.js"
@@ -114,7 +115,7 @@ export const updateProfile = async (req, res, next) => {
       return res.status(500).json({ message: "Internal Server Error", error: error.message });
     }
   };
-  export const deleteChild=async(req,res,next)=>{
+export const deleteChild=async(req,res,next)=>{
     const childId=req.params.childId;
    const child = await childModel.findById(childId);
    if (!child) {
@@ -132,10 +133,9 @@ export const updateProfile = async (req, res, next) => {
        await cloudinary.uploader.destroy(drawing.imageUrl.public_id);
      }
    }
-   await drawingModel.deleteMany({ parentId });
-   await childModel.deleteMany({ parentId });
-   await parentModel.findByIdAndDelete(parentId);
-  
-      return res.status(200).json({ message: "Parent account and associated data deleted successfully" });
+   await drawingModel.deleteMany({ childId });
+   await childModel.findOneAndDelete({_id: childId });
+
+      return res.status(200).json({ message: "Child profile and associated data deleted successfully" });
     
   };

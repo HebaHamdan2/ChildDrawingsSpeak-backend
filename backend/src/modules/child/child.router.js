@@ -12,5 +12,4 @@ router.get('/',auth(),asyncHandler(childController.getProfiles));//disaply child
 router.get('/:childId',auth(),asyncHandler(childController.getSpecificProfile));//diaply specific child info 
 router.patch('/:childId',auth(),fileUpload(fileValidation.image).single('image'),asyncHandler(childController.updateProfile));//update specific child info
 router.delete("/delete/:childId",auth(),asyncHandler(childController.deleteChild));//delete specific child profile
-router.delete("/delete",auth(),asyncHandler(childController.deleteAllChildren));//delete all children profiles
 export default router;
