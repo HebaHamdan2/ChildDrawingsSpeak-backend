@@ -1,6 +1,5 @@
 import childModel from "../../../DB/model/child.model.js";
 import drawingModel from "../../../DB/model/drawings.model.js";
-import parentModel from "../../../DB/model/parent.model.js";
 import cloudinary from "../../services/cloudinary.js";
 import {pagination} from "../../services/pagination.js"
 export const createProfile=async(req,res,next)=>{
@@ -75,7 +74,7 @@ export const getProfiles = async (req, res, next) => {
     }
   };
 export const getSpecificProfile = async (req, res) => {
-    const child = await childModel.findById(req.params.childId);
+    const child = await childModel.findById(req.params.childId).populate('drawings');
     return res.status(200).json({ message: "success", child });
   };
 export const updateProfile = async (req, res, next) => {

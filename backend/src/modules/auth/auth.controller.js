@@ -36,9 +36,7 @@ export const signUp=async(req,res,next)=>{
        address
     });
     return res.status(201).json({message:"success",createParent});
-} 
-
-
+  } 
 export const confirmEmail=async(req,res,next)=>{
   const token=req.params.token;
   const decoded=jwt.verify(token,process.env.CONFIRMEMAILSECRET);
@@ -52,7 +50,7 @@ export const confirmEmail=async(req,res,next)=>{
   //     return res.redirect(process.env.LOGINFRONTEND);//the login form 
   // }
   }
-  export const signIn=async(req,res,next)=>{
+export const signIn=async(req,res,next)=>{
   const {email,password}=req.body;
   const user=await parentModel.findOne({email});
   if (!user) {
@@ -77,7 +75,7 @@ export const confirmEmail=async(req,res,next)=>{
     );
     return res.status(200).json({ message: "success", token, refreshToken });
   }
-  export const sendCode = async (req, res) => {
+export const sendCode = async (req, res) => {
       const { email } = req.body;
       let code = customAlphabet("1234567890abcdzABCDZ", 4);
       code = code();
@@ -90,8 +88,8 @@ export const confirmEmail=async(req,res,next)=>{
       await sendEmail(email, `reset password`, html);
       // return res.redirect(process.env.FORGETPASSWORDFORM); //redirecet to the  form  for making new password
       return res.status(200).json({ message: "success" }); 
-    };
-    export const forgetPasseword = async (req, res) => {
+  };
+export const forgetPasseword = async (req, res) => {
       const { email, password, code } = req.body;
       const user = await parentModel.findOne({ email });
       if (!user) {
@@ -109,8 +107,8 @@ export const confirmEmail=async(req,res,next)=>{
       user.changePasswordTime = Date.now(); //to  log out from accounts that sign in with old password
       await user.save();
       return res.status(200).json({ message: "success" });
-    };
-    export const deleteInvalidConfirm = async (req, res) => {
+  };
+export const deleteInvalidConfirm = async (req, res) => {
       const users = await parentModel.deleteMany({ confirmEmail: false });
       return res.status(200).json({ message: "success" });
-    };
+  };
