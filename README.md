@@ -29,29 +29,52 @@ This repository provides a backend application built with Node.js and Express.js
 
 ## Data Models
 
-### 1. **Parent**
-- **Fields**:
-  - `email`: Parent's email (unique).
-  - `password`: Hashed password.
-  - `verified`: Email verification status.
-- **Relationships**:
-  - One-to-many relationship with `Child`.
+### **Parent Model**
+### Fields:
+- **`username`**: Parent's username.  
+- **`profilePic`**: Optional profile picture.  
+- **`email`**: Unique email for authentication.  
+- **`password`**: Hashed password for security.  
+- **`confirmEmail`**: Email verification status.  
+- **`sendCode`**: Temporary code for email confirmation or password recovery.  
+- **`changePasswordTime`**: Timestamp of the last password change.  
+- **`address`**: Parent's address.
 
-### 2. **Child**
-- **Fields**:
-  - `name`: Child's name.
-  - `age`: Child's age.
-  - `profileImage`: Child's profile image (stored in Cloudinary).
-- **Relationships**:
-  - One-to-many relationship with `Drawing`.
-  - Belongs to `Parent`.
+### Virtual Fields:
+- **`children`**: Links to the `Child` model (1-to-many relationship).
 
-### 3. **Drawing**
-- **Fields**:
-  - `imageUrl`: URL and public ID of the uploaded drawing (stored in Cloudinary).
-  - `prediction`: Psychological health classification from the trained model.
-- **Relationships**:
-  - Belongs to a `Child`.
+### **Child Model**
+
+### Fields:
+- **`name`**: Child's name.  
+- **`dateOfBirth`**: Child's date of birth.  
+- **`gender`**: Child's gender (`Male`/`Female`).  
+- **`profilePic`**: Optional profile picture.  
+- **`parentId`**: Links to the `Parent` model.
+
+### Virtual Fields:
+- **`drawings`**: Links to the `Drawing` model (1-to-many relationship).
+
+### **Drawing Model**
+
+### Fields:
+- **`imageUrl`**: Drawing's Cloudinary URL and public ID.  
+- **`prediction`**: Psychological analysis result.  
+- **`childId`**: Links to the `Child` model.  
+- **`parentId`**: Links to the `Parent` model.
+
+## **Relationships**
+
+1. **Parent → Children**:  
+   One parent can have multiple children.  
+   - Defined via the virtual field `children` in the `Parent` model.
+
+2. **Child → Drawings**:  
+   One child can have multiple drawings.  
+   - Defined via the virtual field `drawings` in the `Child` model.
+
+3. **Parent → Drawings**:  
+   Drawings are indirectly linked to parents using `parentId` in the `Drawing` model.
 
 ## Technology Stack
 
