@@ -27,8 +27,6 @@ This repository provides a backend application built with Node.js and Express.js
 - **Email Notifications**:
   - Email confirmation and notifications are sent using `nodemailer`.
 
----
-
 ## Data Models
 
 ### 1. **Parent**
@@ -55,8 +53,6 @@ This repository provides a backend application built with Node.js and Express.js
 - **Relationships**:
   - Belongs to a `Child`.
 
----
-
 ## Technology Stack
 
 - **Backend**: Node.js, Express.js
@@ -67,8 +63,6 @@ This repository provides a backend application built with Node.js and Express.js
 - **Email Service**: `nodemailer`
 - **Cross-Origin Resource Sharing**: `cors`
 
----
-
 ## Setup Instructions
 
 ### 1. Clone the Repository
@@ -76,4 +70,30 @@ This repository provides a backend application built with Node.js and Express.js
 git clone https://github.com/HebaHamdan2/ChildDrawingsSpeak.git
 cd ChildDrawingsSpeak
 ```
+### 2. Install Dependencies
+```bash
+npm install
+```
+### 3. Environment Variables
+ - Create a .env file in the root directory and set the following variables:
+```bash
+DB=<your-mongodb-connection-string>
+PASSWORDSENDER=<your-password>
+EMAILSENDER=<your-email-address>
+SALT_ROUND=<number-of-hashing>
+CONFIRMEMAILSECRET=<your-confirm-email-secret>
+APP_NAME=<your-app-name>
+LOGINSECRET=<your-login-secret>
+BEARERKEY=<your-bearerkey>
+cloud_name=<youe-cloudinary-name>
+api_key=<your-api-key-cloudinary>
+api_secret=<your-api-secret-cloudinary>
+```
+### 4. Run the Server
+ - Start the server in development mode:
+```bash
+npm run dev
+```
+## Contributing
 
+Contributions are welcome! Please feel free to create an issue or submit a pull request for enhancements or bug fixes.
