@@ -79,12 +79,14 @@ This repository provides a backend application built with Node.js and Express.js
 ## Technology Stack
 
 - **Backend**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose for data modeling
 - **Authentication**: JWT, `bcryptjs`
 - **Validation**: `Joi`
 - **File Upload**: `multer`, Cloudinary
 - **Environment Management**: `dotenv`
 - **Email Service**: `nodemailer`
 - **Cross-Origin Resource Sharing**: `cors`
+- **Testing & Documentation:** Postman
 
 ## Setup Instructions
 
