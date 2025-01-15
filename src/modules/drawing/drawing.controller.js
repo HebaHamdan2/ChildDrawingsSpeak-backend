@@ -30,40 +30,80 @@ export const addDrawingPredict = async (req, res, next) => {
     next(err);
   }
 };
+export const getAllChildDrawings = async (req, res, next) => {
+  const { skip, limit } = pagination(req.query.page, req.query.limit);
+  const {childId}=req.params;
+  let queryObj = { ...req.body,childId };
+
+
+  // Fields to exclude from queryObj
+  const execQuery = ['page', 'limit', 'skip', 'sort'];
+  execQuery.forEach((field) => delete queryObj[field]);
+
+  // Replace MongoDB operators (gt, gte, etc.) with their prefixed `$` versions
+  let queryStr = JSON.stringify(queryObj);
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte|in|nin|eq|neq)\b/g, (match) => `$${match}`);
+  queryObj = JSON.parse(queryStr);
+
+  // Query the drawingModel with the constructed query object
+  let mongooseQuery = drawingModel.find(queryObj).limit(limit).skip(skip).populate('childId');
+
+  // Sort the query if the sort parameter exists
+  const drawings = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
+
+  // Get the total document count
+  const count = await drawingModel.countDocuments(queryObj);
+
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(count / limit);
+  const currentPage = parseInt(req.query.page, 10) || 1;
+
+  // Return the response with paginated drawings
+  return res.json({
+    message: 'success',
+    page: currentPage,
+    total: totalPages,
+    count,
+    drawings,
+  });
+};
+
 export const getAllDrawings=async(req,res,next)=>{
-    const { skip, limit } = pagination(req.query.page, req.query.limit);
-    const {childId}=req.params;
-    let queryObj = { ...req.body,childId };
-  
-    // Fields to exclude from queryObj
-    const execQuery = ['page', 'limit', 'skip', 'sort'];
-    execQuery.forEach((field) => delete queryObj[field]);
+  const { skip, limit } = pagination(req.query.page, req.query.limit);
+  let queryObj = { ...req.body};
 
-    // Replace MongoDB operators (gt, gte, etc.) with their prefixed `$` versions
-    queryObj = JSON.stringify(queryObj);
-    queryObj = queryObj.replace(
-      /\b(gt|gte|lt|lte|in|nin|eq|neq)\b/g,
-      (match) => `$${match}`
-    );
-    queryObj = JSON.parse(queryObj);
-    let mongooseQuery = drawingModel.find(queryObj).limit(limit).skip(skip);
-  
+  // Fields to exclude from queryObj
+  const execQuery = ['page', 'limit', 'skip', 'sort'];
+  execQuery.forEach((field) => delete queryObj[field]);
 
-    // Sort the query if the sort parameter exists
-    const children = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
+  // Replace MongoDB operators (gt, gte, etc.) with their prefixed `$` versions
+  queryObj = JSON.stringify(queryObj);
+  queryObj = queryObj.replace(
+    /\b(gt|gte|lt|lte|in|nin|eq|neq)\b/g,
+    (match) => `$${match}`
+  );
+  queryObj = JSON.parse(queryObj);
+  let mongooseQuery = drawingModel.find(queryObj).limit(limit).skip(skip).populate('childId');
 
-    // Get the total document count
-    const count = await drawingModel.estimatedDocumentCount();
 
-    // Return the response with paginated children profiles
-    return res.json({
-      message: 'success',
-      page: children.length,
-      total: count,
-      children,
-    });
-  
-}
+  // Sort the query if the sort parameter exists
+  const drawings = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
+
+  // Get the total document count
+  const count = await drawingModel.estimatedDocumentCount();
+  const totalPages = Math.ceil(count / limit);
+  const currentPage = parseInt(req.query.page, 10) || 1;
+
+  // Return the response with paginated drawings
+  return res.json({
+    message: 'success',
+    page: currentPage,
+    totalPages,
+    count,
+    drawings,
+  });
+};
+
 export const getSpecificDrawing=async(req,res,nex)=>{
   const{childId,drawingId}=req.params;
   const parentId=req.user._id;

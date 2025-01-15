@@ -4,10 +4,13 @@ import cloudinary from "../../services/cloudinary.js";
 import {pagination} from "../../services/pagination.js"
 export const createProfile=async(req,res,next)=>{
 const {name,dateOfBirth,gender}=req.body;
+if (!name || !dateOfBirth || !gender) {
+  return next(new Error('Missing required fields', { cause: 400 }));
+}
 const parentId=req.user._id;
 const child = await childModel.findOne({ name, parentId }); 
 if(child) {
-    return next(new Error(`${name} already has a profile under the given parentId`, { cause: 409 }));
+    return next(new Error(`${name} already has a profile `, { cause: 409 }));
 }
 let profilePic=null;
 if(req?.file?.path){
@@ -60,12 +63,14 @@ export const getProfiles = async (req, res, next) => {
   
       // Get the total document count
       const count = await childModel.estimatedDocumentCount();
-  
+      const totalPages = Math.ceil(count / limit);
+      const currentPage = parseInt(req.query.page, 10) || 1;
+    
       // Return the response with paginated children profiles
       return res.json({
         message: 'success',
-        page: children.length,
-        total: count,
+        page: currentPage,
+        total: totalPages,
         children,
       });
     } catch (error) {
@@ -101,7 +106,7 @@ export const updateProfile = async (req, res, next) => {
         const parentId=req.user._id;
         const child = await childModel.findOne({name:req.body.name, parentId }); 
         if(child) {
-            return next(new Error(`${req.body.name} already has a profile under the given parentId`, { cause: 409 }));
+            return next(new Error(`${req.body.name} already there's child under the given name`, { cause: 409 }));
         }else{
           updates.name = req.body.name;
 

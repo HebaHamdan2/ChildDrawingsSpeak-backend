@@ -46,7 +46,7 @@ export const updateAccount = async (req, res, next) => {
         const user=await parentModel.findById(req.user._id);
         const match=bcrypt.compareSync(oldPassword,user.password);
         if(!match){
-            return next(new Error("Invalid old password"));
+          return res.status(400).json({message:"Invalid old password"});
         }
         const hashPassword=bcrypt.hashSync(newPassword,parseInt(process.env.SALTROUND));
         user.password=hashPassword;
