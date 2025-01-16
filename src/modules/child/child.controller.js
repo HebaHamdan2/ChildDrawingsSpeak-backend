@@ -28,9 +28,10 @@ return res.status(201).json({message:"success",Child});
 export const getProfiles = async (req, res, next) => {
     try {
       const { skip, limit } = pagination(req.query.page, req.query.limit);
-  
+      const parentId = req.user._id;
+
       // Clone and process the request body for query filtering
-      let queryObj = { ...req.body };
+      let queryObj = { ...req.body,parentId };
   
       // Fields to exclude from queryObj
       const execQuery = ['page', 'limit', 'skip', 'sort', 'search'];

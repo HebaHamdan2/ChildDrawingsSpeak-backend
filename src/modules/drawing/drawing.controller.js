@@ -35,7 +35,6 @@ export const getAllChildDrawings = async (req, res, next) => {
   const {childId}=req.params;
   let queryObj = { ...req.body,childId };
 
-
   // Fields to exclude from queryObj
   const execQuery = ['page', 'limit', 'skip', 'sort'];
   execQuery.forEach((field) => delete queryObj[field]);
@@ -70,8 +69,10 @@ export const getAllChildDrawings = async (req, res, next) => {
 
 export const getAllDrawings=async(req,res,next)=>{
   const { skip, limit } = pagination(req.query.page, req.query.limit);
-  let queryObj = { ...req.body};
+      const parentId = req.user._id;
 
+  let queryObj = { ...req.body,parentId};
+  
   // Fields to exclude from queryObj
   const execQuery = ['page', 'limit', 'skip', 'sort'];
   execQuery.forEach((field) => delete queryObj[field]);
