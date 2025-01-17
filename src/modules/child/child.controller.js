@@ -5,14 +5,14 @@ import {pagination} from "../../services/pagination.js"
 export const createProfile=async(req,res,next)=>{
 const {name,dateOfBirth,gender}=req.body;
 if (!name || !dateOfBirth || !gender) {
-  return next(new Error('Missing required fields', { cause: 400 }));
+ 
 }
 const parentId=req.user._id;
 const child = await childModel.findOne({ name, parentId }); 
 if(child) {
-    return next(new Error(`${name} already has a profile `, { cause: 409 }));
+  return res.status(409).json({message:'${name} already has a profile'});
 }
-let profilePic=null;
+let profilePic={};
 if(req?.file?.path){
     const {secure_url,public_id}=await cloudinary.uploader.upload(req.file.path,{
         folder:`${process.env.APP_NAME}/children`
@@ -63,15 +63,14 @@ export const getProfiles = async (req, res, next) => {
       const children = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
   
       // Get the total document count
-      const count = await childModel.estimatedDocumentCount();
-      const totalPages = Math.ceil(count / limit);
+      const count = await childModel.countDocuments({parentId});
       const currentPage = parseInt(req.query.page, 10) || 1;
     
       // Return the response with paginated children profiles
       return res.json({
         message: 'success',
         page: currentPage,
-        total: totalPages,
+        total: count,
         children,
       });
     } catch (error) {
@@ -107,7 +106,7 @@ export const updateProfile = async (req, res, next) => {
         const parentId=req.user._id;
         const child = await childModel.findOne({name:req.body.name, parentId }); 
         if(child) {
-            return next(new Error(`${req.body.name} already there's child under the given name`, { cause: 409 }));
+            return next(new Error(`There's child under the given name`, { cause: 409 }));
         }else{
           updates.name = req.body.name;
 

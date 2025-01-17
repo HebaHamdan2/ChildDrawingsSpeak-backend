@@ -91,16 +91,14 @@ export const getAllDrawings=async(req,res,next)=>{
   const drawings = await mongooseQuery.sort(req.query.sort?.replaceAll(',', ' '));
 
   // Get the total document count
-  const count = await drawingModel.estimatedDocumentCount();
-  const totalPages = Math.ceil(count / limit);
+  const count = await drawingModel.countDocuments({ parentId });
   const currentPage = parseInt(req.query.page, 10) || 1;
 
   // Return the response with paginated drawings
   return res.json({
     message: 'success',
     page: currentPage,
-    totalPages,
-    count,
+    total:count,
     drawings,
   });
 };
