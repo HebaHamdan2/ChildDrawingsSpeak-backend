@@ -1,4 +1,4 @@
-# ChildDrawingsSpeak - Backend
+# Draw insight - Backend
 ## Overview
 This repository provides a backend application built with Node.js and Express.js to support an app for analyzing and recording children's psychological health based on their drawings. This backend provides secure APIs for managing parents, children, and their drawings, while integrating services for authentication, validation, email notifications, and cloud-based file storage.
 
@@ -92,8 +92,8 @@ This repository provides a backend application built with Node.js and Express.js
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/HebaHamdan2/ChildDrawingsSpeak.git
-cd ChildDrawingsSpeak
+git clone https://github.com/HebaHamdan2/Draw-Insight-backend.git
+cd Draw-Insight-backend
 ```
 ### 2. Install Dependencies
 ```bash
